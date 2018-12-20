@@ -160,9 +160,11 @@ function webosTvAccessory(log, config, api) {
                 this.log.info('webOS - channel status changed');
 
                 // volume state
-                this.tvChannel = parseInt(res.channelNumber);
-                this.setChannelManually(null, this.tvChannel);
-                this.log.info('webOS - current channel: %s', res.channelNumber);
+                if(!this.changeTvChannelInProgress) {
+                    this.tvChannel = parseInt(res.channelNumber);
+                    this.setChannelManually(null, this.tvChannel);
+                    this.log.info('webOS - current channel: %s', res.channelNumber);
+                }
             }
         });
         this.updateAccessoryStatus();
@@ -606,21 +608,20 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                 this.changeTvChannelInProgress = true;
 
                 if(parseInt(level) > this.tvChannel) {
-                    setTimeout(() => {
                         for(let i = parseInt(this.tvChannel); i < parseInt(level); i++) {
                             this.lgtv.request('ssap://tv/channelUp');
                         }
-                    }, 20);
                 } else if(parseInt(level) < this.tvChannel) {
-                    setTimeout(() => {
                         for (let i = parseInt(level); i < parseInt(this.tvChannel); i++) {
                             this.lgtv.request('ssap://tv/channelDown');
                         }
-                    }, 20);
                 }
 
                 setTimeout(() => {
                     this.changeTvChannelInProgress = false;
+                    
+                    this.tvChannel = parseInt(level);
+                    this.setChannelManually(null, this.tvChannel);
                 }, 500);
             }
         }, 1500);
