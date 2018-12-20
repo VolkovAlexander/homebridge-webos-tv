@@ -184,9 +184,7 @@ function webosTvAccessory(log, config, api) {
         .setCharacteristic(Characteristic.Model, 'webOS TV')
         .setCharacteristic(Characteristic.SerialNumber, '-')
         .setCharacteristic(Characteristic.FirmwareRevision, '1.1.0');
-
-
-    this.enabledServices.push(this.powerService);
+    
     this.enabledServices.push(this.informationService);
 
     this.prepareVolumeService();
