@@ -383,8 +383,7 @@ webosTvAccessory.prototype.setVolumeManually = function (error, value) {
 };
 
 webosTvAccessory.prototype.setChannelManually = function (error, value) {
-    this.log.info('webos - in progress: ' + this.changeTvChannelInProgress);
-    if (this.channelService) this.channelService.getCharacteristic(Characteristic.Brightness).updateValue(value);
+    if (this.channelService && !this.changeTvChannelInProgress) this.channelService.getCharacteristic(Characteristic.Brightness).updateValue(value);
 };
 
 webosTvAccessory.prototype.setAppSwitchManually = function (error, value, appId) {
@@ -622,7 +621,7 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
 
 
                 setTimeout(() => {
-                    this.changeTvChannelInProgress = false;
+                    this.f = false;
                 }, 500);
 
             }
