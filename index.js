@@ -579,6 +579,7 @@ webosTvAccessory.prototype.getChannel = function (callback) {
 
 webosTvAccessory.prototype.setChannel = function (level, callback) {
     if (this.connected) {
+        this.log.info('webOS - try to change channel to ' + level);
         this.lgtv.request('ssap://tv/openChannel', {
             channelNumber: level
         });
