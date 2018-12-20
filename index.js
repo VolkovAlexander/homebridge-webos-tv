@@ -156,14 +156,13 @@ webosTvAccessory.prototype.prepareVolumeService = function() {
 	    return;
 	}
 
-	// slider/lightbulb
-	if(this.volumeControl == true || this.volumeControl === "slider"){
-		this.volumeService = new Service.Lightbulb(this.name + " Volume", "volumeService");
+	if(this.volumeControl == true){
+		this.volumeService = new Service.Lightbulb(this.name, "volumeService");
 
 		this.volumeService
 			.getCharacteristic(Characteristic.On)
-			.on('get', this.getMuteState.bind(this))
-			.on('set', this.setMuteState.bind(this));
+			.on('get', this.getState.bind(this))
+			.on('set', this.setState.bind(this));
 
 		this.volumeService
 			.addCharacteristic(new Characteristic.Brightness())
@@ -172,34 +171,6 @@ webosTvAccessory.prototype.prepareVolumeService = function() {
 
 		this.enabledServices.push(this.volumeService);
 	}
-
-	// up/down switches
-	if(this.volumeControl == true || this.volumeControl === "switch"){
-	    this.volumeUpService = new Service.Switch(this.name + " Volume Up", "volumeUpService");
-
-		this.volumeUpService
-			.getCharacteristic(Characteristic.On)
-			.on('get', this.getVolumeSwitch.bind(this))
-			.on('set', (state, callback) => {
-				this.setVolumeSwitch(state, callback, true);
-			});
-
-
-		this.enabledServices.push(this.volumeUpService);
-
-		this.volumeDownService = new Service.Switch(this.name + " Volume Down", "volumeDownService");
-
-		this.volumeDownService
-			.getCharacteristic(Characteristic.On)
-			.on('get', this.getVolumeSwitch.bind(this))
-			.on('set', (state, callback) => {
-				this.setVolumeSwitch(state, callback, false);
-			});
-
-
-		this.enabledServices.push(this.volumeDownService);
-	}
-
 };
 
 webosTvAccessory.prototype.prepareAppSwitchService = function() {
