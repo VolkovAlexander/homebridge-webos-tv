@@ -501,11 +501,11 @@ webosTvAccessory.prototype.setState = function (state, callback) {
             mqttPublish(this.mqttClient, this.topics.setOn, 0);
             mqttPublish(this.mqttClient, this.topics.setOn, 1);
 
-            var counter = 0;
+            let counter = 0;
             while(!this.connected) {
                 counter += 1;
                 if(counter > 300) {
-                    callback(new Error('webOS - wake timeout'));
+                    break;
                 } else {
                     this.log.info('webOS - try to reconnect');
                     setTimeout(this.getState.bind(this, callback), 500);
