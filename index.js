@@ -172,7 +172,7 @@ function webosTvAccessory(log, config, api) {
         }
         this.log.debug('webOS - subscribing to TV services');
 
-        subscribe();
+        this.subscribe.bind(this);
         this.updateAccessoryStatus();
     });
 
@@ -633,7 +633,7 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
 
                     this.tvChannel = parseInt(level);
                     this.setChannelManually(null, this.tvChannel);
-                    subscribe();
+                    this.subscribe.bind(this);
                 }, 500);
             }
         }, 1500);
