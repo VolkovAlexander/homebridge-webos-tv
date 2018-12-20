@@ -302,8 +302,10 @@ webosTvAccessory.prototype.prepareChannelService = function () {
 
         this.volumeService
             .getCharacteristic(Characteristic.On)
-            .on('get', this.getChannelSwitch().bind(this))
-            .on('set', this.setChannelSwitch().bind(this));
+            .on('get', this.getChannelSwitch.bind(this))
+            .on('set', (state, callback) => {
+                this.setChannelSwitch(state, callback, true);
+            });
 
         this.channelService
             .addCharacteristic(new Characteristic.Brightness())
@@ -577,7 +579,7 @@ webosTvAccessory.prototype.setVolume = function (level, callback) {
 };
 
 webosTvAccessory.prototype.getChannelSwitch = function(callback) {
-    callback(null, false);
+    callback(null, 0);
 };
 
 webosTvAccessory.prototype.setChannelSwitch = function(state, callback, isUp) {
