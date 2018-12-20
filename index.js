@@ -481,6 +481,7 @@ webosTvAccessory.prototype.checkWakeOnLan = function (callback) {
         if (this.checkCount < 100) {
             this.checkCount++;
             this.lgtv.connect(this.url);
+            this.log.info('webOS - try to reconnect');
             setTimeout(this.checkWakeOnLan.bind(this, callback), 500);
         } else {
             this.checkCount = 0;
@@ -501,18 +502,7 @@ webosTvAccessory.prototype.setState = function (state, callback) {
             mqttPublish(this.mqttClient, this.topics.setOn, 0);
             mqttPublish(this.mqttClient, this.topics.setOn, 1);
 
-            let counter = 0;
-            while(!this.connected) {
-                counter += 1;
-                if(counter > 300) {
-                    this.log.error('webOS - wake timeout');
-                    break;
-                } else {
-                    this.log.info('webOS - try to reconnect');
-                    setTimeout(this.getState.bind(this, callback), 3500);
-                }
-            }
-
+            this.checkWakeOnLan.bind(this, callback);
         } else {
             callback();
         }
