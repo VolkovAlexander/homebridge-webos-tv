@@ -163,7 +163,7 @@ function webosTvAccessory(log, config, api) {
                 this.tvChannel = parseInt(res.channelNumber);
                 this.setChannelManually(null, this.tvChannel);
                 this.log.info('webOS - current channel: %s', res.channelId);
-                this.channelsToIds[this.tvChannel] = res.channelId;
+                this.channelsToIds[res.channelNumber] = res.channelId;
                 this.log.info(this.channelsToIds);
             }
         });
