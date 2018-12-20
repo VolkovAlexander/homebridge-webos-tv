@@ -159,12 +159,7 @@ function webosTvAccessory(log, config, api) {
                 // volume state
                 this.tvChannel = parseInt(res.channelNumber);
                 this.setChannelManually(null, this.tvChannel);
-                this.log.info('webOS - current channel: %s', res.channel);
-
-                // mute state
-                this.tvMuted = res.mute;
-                this.setMuteStateManually(null, !this.tvMuted);
-                this.log.info('webOS - muted: %s', res.mute ? "Yes" : "No");
+                this.log.info('webOS - current channel: %s', res.channelNumber);
             }
         });
         this.updateAccessoryStatus();
@@ -584,7 +579,7 @@ webosTvAccessory.prototype.getChannel = function (callback) {
 
 webosTvAccessory.prototype.setChannel = function (level, callback) {
     if (this.connected) {
-        this.lgtv.request('ssap://audio/openChannel', {
+        this.lgtv.request('ssap://tv/openChannel', {
             channel: level
         });
         callback();
