@@ -505,6 +505,7 @@ webosTvAccessory.prototype.setState = function (state, callback) {
             while(!this.connected) {
                 counter += 1;
                 if(counter > 300) {
+                    this.log.error('webOS - wake timeout');
                     break;
                 } else {
                     this.log.info('webOS - try to reconnect');
