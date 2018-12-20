@@ -76,6 +76,7 @@ function mqttPublish(client, topic, message) {
 function webosTvAccessory(log, config, api) {
     this.mqttClient = mqttInit(config);
     this.topics = config.topics;
+    this.channelsToIds = [];
 
     this.newTvChannel = 0;
     this.log = log;
@@ -162,7 +163,8 @@ function webosTvAccessory(log, config, api) {
                 this.tvChannel = parseInt(res.channelNumber);
                 this.setChannelManually(null, this.tvChannel);
                 this.log.info('webOS - current channel: %s', res.channelId);
-
+                this.channelsToIds[this.tvChannel] = res.channelId;
+                this.log.info(this.channelsToIds);
             }
         });
         this.updateAccessoryStatus();
@@ -600,32 +602,13 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
     if (this.connected) {
 
         this.newTvChannel = parseInt(level);
-        setTimeout(() => {
-            if(this.newTvChannel == parseInt(level) && !this.changeTvChannelInProgress) {
-                this.log.info('webos - New approved for change: ' + this.newTvChannel + ' ' + this.tvChannel);
-                this.changeTvChannelInProgress = true;
 
-                if(parseInt(level) > this.tvChannel) {
-                    setTimeout(() => {
-                        for (let i = parseInt(this.tvChannel); i < parseInt(level); i++) {
-                            this.lgtv.request('ssap://tv/channelUp');
-                        }
-                    }, 15);
-                } else if(parseInt(level) < this.tvChannel) {
-                    setTimeout(() => {
-                        for (let i = parseInt(level); i < parseInt(this.tvChannel); i++) {
-                            this.lgtv.request('ssap://tv/channelDown');
-                        }
-                    }, 15);
-                }
+        if(typeof this.channelsToIds[this.newTvChannel] !== 'undefined') {
+            this.lgtv.request('ssap://tv/openChannel', {
+                channelId: this.channelsToIds[this.newTvChannel]
+            });
+        }
 
-
-                setTimeout(() => {
-                    this.f = false;
-                }, 500);
-
-            }
-        }, 1500);
         callback();
     } else {
         callback(new Error('webOS - is not connected, cannot set channel'));
