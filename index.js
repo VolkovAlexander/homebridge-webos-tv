@@ -580,9 +580,16 @@ webosTvAccessory.prototype.getChannel = function (callback) {
 webosTvAccessory.prototype.setChannel = function (level, callback) {
     if (this.connected) {
         this.log.info('webOS - try to change channel to ' + level);
-        this.lgtv.request('ssap://tv/openChannel', {
-            channelNumber: level
-        });
+        if(level < this.tvChannel) {
+            for(let i = this.tvChannel; i < level; i++) {
+                this.lgtv.request('ssap://tv/channelDown');
+            }
+        } else {
+            for(let i = this.tvChannel; i > level; i--) {
+                this.lgtv.request('ssap://tv/channelUp');
+            }
+        }
+
         callback();
     } else {
         callback(new Error('webOS - is not connected, cannot set channel'));
