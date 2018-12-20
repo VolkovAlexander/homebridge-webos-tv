@@ -601,9 +601,8 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
 
         this.newTvChannel = parseInt(level);
         setTimeout(() => {
-            this.log.info('webos - New approved for change: ' + this.newTvChannel);
-
             if(this.newTvChannel == parseInt(level) && !this.changeTvChannelInProgress) {
+                this.log.info('webos - New approved for change: ' + this.newTvChannel + ' ' + this.tvChannel);
                 this.changeTvChannelInProgress = true;
 
                 if(parseInt(level) > this.tvChannel) {
