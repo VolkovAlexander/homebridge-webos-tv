@@ -589,8 +589,8 @@ webosTvAccessory.prototype.setChannelSwitch = function(state, callback, isUp) {
         this.lgtv.request('ssap://tv/channelUp');
         setTimeout(() => {
             this.channelService.getCharacteristic(Characteristic.On).updateValue(false);
+            callback();
         }, 10);
-        callback();
     } else {
         callback(new Error('webOS - is not connected, cannot change channel'));
     }
