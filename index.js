@@ -111,8 +111,8 @@ function webosTvAccessory(log, config, api) {
 
     this.lgtv = new lgtv2({
         url: this.url,
-        timeout: 5000,
-        reconnect: 3000,
+        timeout: 1000,
+        reconnect: 500,
         keyFile: this.keyFile
     });
 
