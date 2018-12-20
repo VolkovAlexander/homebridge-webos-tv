@@ -7,6 +7,7 @@ let lgtv, Service, Characteristic;
 var tvVolume = 0;
 var tvChannel = 0;
 var newTvChannel = 0;
+var changeTvChannelInProgress = false;
 var tvMuted = false;
 
 // note to myself: 
@@ -77,7 +78,6 @@ function webosTvAccessory(log, config, api) {
     this.topics = config.topics;
 
     this.newTvChannel = 0;
-    this.changeTvChannelInProgress = false;
     this.log = log;
     this.ip = config['ip'];
     this.name = config['name'];
@@ -160,7 +160,7 @@ function webosTvAccessory(log, config, api) {
                 this.log.info('webOS - channel status changed');
 
                 // volume state
-                if(!this.changeTvChannelInProgress) {
+                if(!changeTvChannelInProgress) {
                     this.tvChannel = parseInt(res.channelNumber);
                     this.setChannelManually(null, this.tvChannel);
                     this.log.info('webOS - current channel: %s', res.channelNumber);
@@ -603,9 +603,9 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
 
         this.newTvChannel = parseInt(level);
         setTimeout(() => {
-            if(this.newTvChannel == parseInt(level) && !this.changeTvChannelInProgress) {
+            if(this.newTvChannel == parseInt(level) && !changeTvChannelInProgress) {
                 this.log.info('webos - New approved for change: ' + this.newTvChannel + ' ' + this.tvChannel);
-                this.changeTvChannelInProgress = true;
+                changeTvChannelInProgress = true;
 
                 if(parseInt(level) > this.tvChannel) {
                     setTimeout(() => {
@@ -622,7 +622,7 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                 }
 
                 setTimeout(() => {
-                    this.changeTvChannelInProgress = false;
+                    changeTvChannelInProgress = false;
 
                     this.tvChannel = parseInt(level);
                     this.setChannelManually(null, this.tvChannel);
