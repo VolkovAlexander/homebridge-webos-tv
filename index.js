@@ -177,14 +177,22 @@ function webosTvAccessory(log, config, api) {
         this.connected = false;
     });
 
+    this.powerService = new Service.Switch(this.name + " Power", "powerService");
     this.informationService = new Service.AccessoryInformation();
+
+
+    this.powerService
+        .getCharacteristic(Characteristic.On)
+        .on('get', this.getState.bind(this))
+        .on('set', this.setState.bind(this));
 
     this.informationService
         .setCharacteristic(Characteristic.Manufacturer, 'LG Electronics Inc.')
         .setCharacteristic(Characteristic.Model, 'webOS TV')
         .setCharacteristic(Characteristic.SerialNumber, '-')
         .setCharacteristic(Characteristic.FirmwareRevision, '1.1.0');
-    
+
+
     this.enabledServices.push(this.informationService);
 
     this.prepareVolumeService();
