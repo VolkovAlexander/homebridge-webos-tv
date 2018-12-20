@@ -304,7 +304,7 @@ webosTvAccessory.prototype.prepareChannelService = function () {
             .getCharacteristic(Characteristic.On)
             .on('get', (state, callback) => {
                 this.getChannelSwitch(callback);
-            });
+            })
             .on('set', (state, callback) => {
                 this.setChannelSwitch(state, callback, true);
             });
