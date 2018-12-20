@@ -499,6 +499,7 @@ webosTvAccessory.prototype.getState = function (callback) {
 webosTvAccessory.prototype.setState = function (state, callback) {
     if (state) {
         if (!this.connected) {
+            mqttPublish(this.mqttClient, this.topics.setOn, 0);
             mqttPublish(this.mqttClient, this.topics.setOn, 1);
             setTimeout(this.checkWakeOnLan.bind(this, callback), 1000);
         } else {
