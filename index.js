@@ -300,6 +300,11 @@ webosTvAccessory.prototype.prepareChannelService = function () {
     if (this.channelControl == true) {
         this.channelService = new Service.Lightbulb(this.name + " Channels", "channelService");
 
+        this.volumeService
+            .getCharacteristic(Characteristic.On)
+            .on('get', this.getChannelSwitch().bind(this))
+            .on('set', this.setChannelSwitch().bind(this));
+
         this.channelService
             .addCharacteristic(new Characteristic.Brightness())
             .on('get', this.getChannel.bind(this))
@@ -568,6 +573,22 @@ webosTvAccessory.prototype.setVolume = function (level, callback) {
         callback();
     } else {
         callback(new Error('webOS - is not connected, cannot set volume'));
+    }
+};
+
+webosTvAccessory.prototype.getChannelSwitch = function(callback) {
+    callback(null, false);
+};
+
+webosTvAccessory.prototype.setChannelSwitch = function(state, callback, isUp) {
+    if (this.connected) {
+        this.lgtv.request('ssap://tv/channelUp');
+        setTimeout(() => {
+            this.channelService.getCharacteristic(Characteristic.On).updateValue(false);
+        }, 10);
+        callback();
+    } else {
+        callback(new Error('webOS - is not connected, cannot change channel'));
     }
 };
 
