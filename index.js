@@ -19,7 +19,7 @@ module.exports = function (homebridge) {
     homebridge.registerAccessory('homebridge-webos-tv-volandkb', 'webostv-private', webosTvAccessory);
 };
 
-function mqttInit() {
+function mqttInit(config) {
     var clientId = 'mqttthing_' + config.name.replace(/[^\x20-\x7F]/g, "") + '_' + Math.random().toString(16).substr(2, 8);
 
     // start with any configured options object
@@ -56,9 +56,7 @@ function mqttInit() {
     return mqtt.connect(config.url, options);
 }
 
-var mqttClient = mqttInit();
-
-function mqttPublish(topic, message) {
+function mqttPublish(client, topic, message) {
     if (typeof topic != 'string') {
         var extendedTopic = topic;
         topic = extendedTopic['topic'];
@@ -68,11 +66,13 @@ function mqttPublish(topic, message) {
         }
     }
 
-    mqttClient.publish(topic, message.toString());
+    client.publish(topic, message.toString());
 }
 
 // MAIN SETUP
 function webosTvAccessory(log, config, api) {
+    this.mqttClient = mqttInit(config);
+
     this.log = log;
     this.ip = config['ip'];
     this.name = config['name'];
@@ -498,7 +498,7 @@ webosTvAccessory.prototype.getState = function (callback) {
 webosTvAccessory.prototype.setState = function (state, callback) {
     if (state) {
         if (!this.connected) {
-            mqttPublish(config.topics.setOn, "1");
+            mqttPublish(this.mqttClient, this.config.topics.setOn, "1");
         } else {
             callback();
         }
