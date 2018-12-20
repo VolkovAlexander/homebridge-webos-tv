@@ -383,6 +383,7 @@ webosTvAccessory.prototype.setVolumeManually = function (error, value) {
 };
 
 webosTvAccessory.prototype.setChannelManually = function (error, value) {
+    this.log.info('webos - in progress: ' + this.changeTvChannelInProgress);
     if (this.channelService) this.channelService.getCharacteristic(Characteristic.Brightness).updateValue(value);
 };
 
@@ -601,11 +602,10 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
 
         this.newTvChannel = parseInt(level);
         setTimeout(() => {
-            if(this.newTvChannel == parseInt(level) && !changeTvChannelInProgress) {
+            if(this.newTvChannel == parseInt(level) && !this.changeTvChannelInProgress) {
                 this.log.info('webos - New approved for change: ' + this.newTvChannel + ' ' + this.tvChannel);
-                changeTvChannelInProgress = true;
+                this.changeTvChannelInProgress = true;
 
-                /*
                 if(parseInt(level) > this.tvChannel) {
                     setTimeout(() => {
                         for (let i = parseInt(this.tvChannel); i < parseInt(level); i++) {
@@ -619,16 +619,10 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                         }
                     }, 15);
                 }
-                */
 
-                let res = this.lgtv.request('ssap://tv/openChannel', {
-                    channelNumber: "" + level + ""
-                });
-
-                this.log.info(res);
 
                 setTimeout(() => {
-                    changeTvChannelInProgress = false;
+                    this.changeTvChannelInProgress = false;
                 }, 500);
 
             }
