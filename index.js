@@ -300,15 +300,6 @@ webosTvAccessory.prototype.prepareChannelService = function () {
     if (this.channelControl == true) {
         this.channelService = new Service.Lightbulb(this.name + " Channels", "channelService");
 
-        this.volumeService
-            .getCharacteristic(Characteristic.On)
-            .on('get', (state, callback) => {
-                this.getChannelSwitch(callback);
-            })
-            .on('set', (state, callback) => {
-                this.setChannelSwitch(state, callback, true);
-            });
-
         this.channelService
             .addCharacteristic(new Characteristic.Brightness())
             .on('get', this.getChannel.bind(this))
@@ -606,10 +597,10 @@ webosTvAccessory.prototype.getChannel = function (callback) {
 
 webosTvAccessory.prototype.setChannel = function (level, callback) {
     if (this.connected) {
-        this.log.info('webOS - try to change channel to ' + level);
 
         this.newTvChannel = parseInt(level);
         setTimeout(() => {
+            this.log.info('webos - New approved for change: ' + this.newTvChannel);
             if(this.newTvChannel == parseInt(level)) {
                 if(parseInt(level) > this.tvChannel) {
                     for(let i = parseInt(this.tvChannel); i < parseInt(level); i++) {
