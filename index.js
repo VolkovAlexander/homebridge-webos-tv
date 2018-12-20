@@ -381,7 +381,7 @@ webosTvAccessory.prototype.setMuteStateManually = function (error, value) {
 };
 
 webosTvAccessory.prototype.setVolumeManually = function (error, value) {
-    if (this.volumeService) this.volumeService.getCharacteristic(Characteristic.Brightness).updateValue(value);
+    if (this.volumeService) this.volumeService.getCharacteristic(Characteristic.Volume).updateValue(value);
 };
 
 webosTvAccessory.prototype.setChannelManually = function (error, value) {
