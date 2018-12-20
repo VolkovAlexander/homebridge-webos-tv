@@ -620,7 +620,7 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                     this.changeTvChannelInProgress = false;
                 }, 500);
             }
-        }, 1500);
+        }, 2000);
         callback();
     } else {
         callback(new Error('webOS - is not connected, cannot set channel'));
