@@ -481,6 +481,7 @@ webosTvAccessory.prototype.checkWakeOnLan = function (callback) {
         if (this.checkCount < 100) {
             this.checkCount++;
             this.lgtv.connect(this.url);
+            this.log.info('webOS - try to reconnect');
             setTimeout(this.checkWakeOnLan.bind(this, callback), 500);
         } else {
             this.checkCount = 0;
