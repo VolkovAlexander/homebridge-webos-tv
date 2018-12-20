@@ -210,7 +210,7 @@ function webosTvAccessory(log, config, api) {
 
     this.prepareVolumeService();
     this.prepareAppSwitchService();
-    //this.prepareChannelService();
+    this.prepareChannelService();
     this.prepareMediaControlService();
 }
 
@@ -234,11 +234,6 @@ webosTvAccessory.prototype.prepareVolumeService = function () {
             .addCharacteristic(new Characteristic.Brightness())
             .on('get', this.getVolume.bind(this))
             .on('set', this.setVolume.bind(this));
-
-        this.volumeService
-            .addCharacteristic(new Characteristic.Saturation())
-            .on('get', this.getChannel.bind(this))
-            .on('set', this.setChannel.bind(this));
 
         this.enabledServices.push(this.volumeService);
     }
@@ -381,7 +376,7 @@ webosTvAccessory.prototype.setMuteStateManually = function (error, value) {
 };
 
 webosTvAccessory.prototype.setVolumeManually = function (error, value) {
-    if (this.volumeService) this.volumeService.getCharacteristic(Characteristic.Volume).updateValue(value);
+    if (this.volumeService) this.volumeService.getCharacteristic(Characteristic.Brightness).updateValue(value);
 };
 
 webosTvAccessory.prototype.setChannelManually = function (error, value) {
@@ -588,6 +583,11 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
         this.lgtv.request('ssap://tv/openChannel', {
             channelNumber: level
         });
+
+        setTimeout(() => {
+            this.lgtv.request('ssap://tv/channelUp');
+        }, 1000);
+
         callback();
     } else {
         callback(new Error('webOS - is not connected, cannot set channel'));
