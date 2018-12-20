@@ -5,6 +5,7 @@ const mqtt = require("mqtt");
 
 let lgtv, Service, Characteristic;
 var tvVolume = 0;
+var tvChannel = 0;
 var tvMuted = false;
 
 // note to myself: 
@@ -149,6 +150,23 @@ function webosTvAccessory(log, config, api) {
                 this.log.info('webOS - muted: %s', res.mute ? "Yes" : "No");
             }
         });
+        this.lgtv.subscribe('ssap://tv/getCurrentChannel', (err, res) => {
+            if (!res || err) {
+                this.log.error('webOS - TV channel status - error while getting current channel status');
+            } else {
+                this.log.info('webOS - channel status changed');
+
+                // volume state
+                this.tvChannel = parseInt(res.channelNumber);
+                this.setChannelManually(null, this.tvChannel);
+                this.log.info('webOS - current channel: %s', res.channel);
+
+                // mute state
+                this.tvMuted = res.mute;
+                this.setMuteStateManually(null, !this.tvMuted);
+                this.log.info('webOS - muted: %s', res.mute ? "Yes" : "No");
+            }
+        });
         this.updateAccessoryStatus();
     });
 
@@ -282,30 +300,16 @@ webosTvAccessory.prototype.prepareChannelService = function () {
         return;
     }
 
-    this.channelUpService = new Service.Switch(this.name + " Channel Up", "channelUpService");
+    if (this.channelControl == true) {
+        this.channelService = new Service.Lightbulb(this.name + " Channels", "channelService");
 
-    this.channelUpService
-        .getCharacteristic(Characteristic.On)
-        .on('get', this.getChannelSwitch.bind(this))
-        .on('set', (state, callback) => {
-            this.setChannelSwitch(state, callback, true);
-        });
+        this.channelService
+            .addCharacteristic(new Characteristic.Brightness())
+            .on('get', this.getChannel.bind(this))
+            .on('set', this.setChannel.bind(this));
 
-
-    this.enabledServices.push(this.channelUpService);
-
-    this.channelDownService = new Service.Switch(this.name + " Channel Down", "channelDownService");
-
-    this.channelDownService
-        .getCharacteristic(Characteristic.On)
-        .on('get', this.getChannelSwitch.bind(this))
-        .on('set', (state, callback) => {
-            this.setChannelSwitch(state, callback, false);
-        });
-
-
-    this.enabledServices.push(this.channelDownService);
-
+        this.enabledServices.push(this.channelService);
+    }
 };
 
 webosTvAccessory.prototype.prepareMediaControlService = function () {
@@ -378,6 +382,10 @@ webosTvAccessory.prototype.setMuteStateManually = function (error, value) {
 
 webosTvAccessory.prototype.setVolumeManually = function (error, value) {
     if (this.volumeService) this.volumeService.getCharacteristic(Characteristic.Brightness).updateValue(value);
+};
+
+webosTvAccessory.prototype.setChannelManually = function (error, value) {
+    if (this.channelService) this.channelService.getCharacteristic(Characteristic.Brightness).updateValue(value);
 };
 
 webosTvAccessory.prototype.setAppSwitchManually = function (error, value, appId) {
@@ -566,6 +574,25 @@ webosTvAccessory.prototype.setVolume = function (level, callback) {
     }
 };
 
+webosTvAccessory.prototype.getChannel = function (callback) {
+    if (this.connected) {
+        callback(null, this.tvChannel);
+    } else {
+        callback(null, 0);
+    }
+};
+
+webosTvAccessory.prototype.setChannel = function (level, callback) {
+    if (this.connected) {
+        this.lgtv.request('ssap://audio/openChannel', {
+            channel: level
+        });
+        callback();
+    } else {
+        callback(new Error('webOS - is not connected, cannot set channel'));
+    }
+};
+
 webosTvAccessory.prototype.getVolumeSwitch = function (callback) {
     callback(null, false);
 };
@@ -587,27 +614,6 @@ webosTvAccessory.prototype.setVolumeSwitch = function (state, callback, isUp) {
         callback();
     } else {
         callback(new Error('webOS - is not connected, cannot set volume'));
-    }
-};
-
-webosTvAccessory.prototype.getChannelSwitch = function (callback) {
-    callback(null, false);
-};
-
-webosTvAccessory.prototype.setChannelSwitch = function (state, callback, isUp) {
-    if (this.connected) {
-        if (isUp) {
-            this.lgtv.request('ssap://tv/channelUp');
-        } else {
-            this.lgtv.request('ssap://tv/channelDown');
-        }
-        setTimeout(() => {
-            this.channelUpService.getCharacteristic(Characteristic.On).updateValue(false);
-            this.channelDownService.getCharacteristic(Characteristic.On).updateValue(false);
-        }, 10);
-        callback();
-    } else {
-        callback(new Error('webOS - is not connected, cannot change channel'));
     }
 };
 
