@@ -77,6 +77,7 @@ function webosTvAccessory(log, config, api) {
     this.topics = config.topics;
 
     this.newTvChannel = 0;
+    this.changeTvChannelInProgress = false;
     this.log = log;
     this.ip = config['ip'];
     this.name = config['name'];
@@ -601,7 +602,10 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
         this.newTvChannel = parseInt(level);
         setTimeout(() => {
             this.log.info('webos - New approved for change: ' + this.newTvChannel);
-            if(this.newTvChannel == parseInt(level)) {
+
+            if(this.newTvChannel == parseInt(level) && !this.changeTvChannelInProgress) {
+                this.changeTvChannelInProgress = true;
+
                 if(parseInt(level) > this.tvChannel) {
                     for(let i = parseInt(this.tvChannel); i < parseInt(level); i++) {
                         this.lgtv.request('ssap://tv/channelUp');
@@ -611,6 +615,10 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                         this.lgtv.request('ssap://tv/channelDown');
                     }
                 }
+
+                setTimeout(() => {
+                    this.changeTvChannelInProgress = false;
+                }, 500);
             }
         }, 1500);
         callback();
