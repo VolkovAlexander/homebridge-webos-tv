@@ -608,18 +608,22 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                 this.changeTvChannelInProgress = true;
 
                 if(parseInt(level) > this.tvChannel) {
-                        for(let i = parseInt(this.tvChannel); i < parseInt(level); i++) {
+                    setTimeout(() => {
+                        for (let i = parseInt(this.tvChannel); i < parseInt(level); i++) {
                             this.lgtv.request('ssap://tv/channelUp');
                         }
+                    }, 15);
                 } else if(parseInt(level) < this.tvChannel) {
+                    setTimeout(() => {
                         for (let i = parseInt(level); i < parseInt(this.tvChannel); i++) {
                             this.lgtv.request('ssap://tv/channelDown');
                         }
+                    }, 15);
                 }
 
                 setTimeout(() => {
                     this.changeTvChannelInProgress = false;
-                    
+
                     this.tvChannel = parseInt(level);
                     this.setChannelManually(null, this.tvChannel);
                 }, 500);
