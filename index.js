@@ -72,49 +72,6 @@ function mqttPublish(client, topic, message) {
     client.publish(topic, message.toString());
 }
 
-function subscribe() {
-    this.lgtv.subscribe('ssap://com.webos.applicationManager/getForegroundAppInfo', (err, res) => {
-        if (!res || err) {
-            this.log.error('webOS - TV app check - error while getting current app');
-        } else {
-            if (res.appId) {
-                this.log.info('webOS - app launched, current appId: %s', res.appId);
-            }
-        }
-    });
-    this.lgtv.subscribe('ssap://audio/getStatus', (err, res) => {
-        if (!res || err) {
-            this.log.error('webOS - TV audio status - error while getting current audio status');
-        } else {
-            this.log.info('webOS - audio status changed');
-
-            // volume state
-            this.tvVolume = res.volume;
-            this.setVolumeManually(null, this.tvVolume);
-            this.log.info('webOS - current volume: %s', res.volume);
-
-            // mute state
-            this.tvMuted = res.mute;
-            this.setMuteStateManually(null, !this.tvMuted);
-            this.log.info('webOS - muted: %s', res.mute ? "Yes" : "No");
-        }
-    });
-    this.lgtv.subscribe('ssap://tv/getCurrentChannel', (err, res) => {
-        if (!res || err) {
-            this.log.error('webOS - TV channel status - error while getting current channel status');
-        } else {
-            this.log.info('webOS - channel status changed');
-
-            // volume state
-            if(!changeTvChannelInProgress) {
-                this.tvChannel = parseInt(res.channelNumber);
-                this.setChannelManually(null, this.tvChannel);
-                this.log.info('webOS - current channel: %s', res.channelNumber);
-            }
-        }
-    });
-}
-
 // MAIN SETUP
 function webosTvAccessory(log, config, api) {
     this.mqttClient = mqttInit(config);
@@ -171,8 +128,44 @@ function webosTvAccessory(log, config, api) {
             this.checkAliveInterval = setInterval(this.checkTVState.bind(this, this.pollCallback.bind(this)), this.alivePollingInterval);
         }
         this.log.debug('webOS - subscribing to TV services');
+        this.lgtv.subscribe('ssap://com.webos.applicationManager/getForegroundAppInfo', (err, res) => {
+            if (!res || err) {
+                this.log.error('webOS - TV app check - error while getting current app');
+            } else {
+                if (res.appId) {
+                    this.log.info('webOS - app launched, current appId: %s', res.appId);
+                }
+            }
+        });
+        this.lgtv.subscribe('ssap://audio/getStatus', (err, res) => {
+            if (!res || err) {
+                this.log.error('webOS - TV audio status - error while getting current audio status');
+            } else {
+                this.log.info('webOS - audio status changed');
 
-        this.subscribe.bind(this);
+                // volume state
+                this.tvVolume = res.volume;
+                this.setVolumeManually(null, this.tvVolume);
+                this.log.info('webOS - current volume: %s', res.volume);
+
+                // mute state
+                this.tvMuted = res.mute;
+                this.setMuteStateManually(null, !this.tvMuted);
+                this.log.info('webOS - muted: %s', res.mute ? "Yes" : "No");
+            }
+        });
+        this.lgtv.subscribe('ssap://tv/getCurrentChannel', (err, res) => {
+            if (!res || err) {
+                this.log.error('webOS - TV channel status - error while getting current channel status');
+            } else {
+                this.log.info('webOS - channel status changed');
+
+                this.tvChannel = parseInt(res.channelNumber);
+                this.setChannelManually(null, this.tvChannel);
+                this.log.info('webOS - current channel: %s', res.channelNumber);
+
+            }
+        });
         this.updateAccessoryStatus();
     });
 
@@ -611,9 +604,9 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
         setTimeout(() => {
             if(this.newTvChannel == parseInt(level) && !changeTvChannelInProgress) {
                 this.log.info('webos - New approved for change: ' + this.newTvChannel + ' ' + this.tvChannel);
+                changeTvChannelInProgress = true;
 
-                this.lgtv.unsubscribe();
-
+                /*
                 if(parseInt(level) > this.tvChannel) {
                     setTimeout(() => {
                         for (let i = parseInt(this.tvChannel); i < parseInt(level); i++) {
@@ -627,14 +620,16 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                         }
                     }, 15);
                 }
+                */
+
+                this.lgtv.request('ssap://tv/openChannel', {
+                    channelNumber: parseInt(level)
+                });
 
                 setTimeout(() => {
                     changeTvChannelInProgress = false;
-
-                    this.tvChannel = parseInt(level);
-                    this.setChannelManually(null, this.tvChannel);
-                    this.subscribe.bind(this);
                 }, 500);
+
             }
         }, 1500);
         callback();
