@@ -481,11 +481,11 @@ webosTvAccessory.prototype.checkWakeOnLan = function (callback) {
         this.lgtv.connect(this.url);
         callback(null, true);
     } else {
-        if (this.checkCount < 100) {
+        if (this.checkCount < 3) {
             this.checkCount++;
             this.lgtv.connect(this.url);
             this.log.info('webOS - try to reconnect');
-            setTimeout(this.checkWakeOnLan.bind(this, callback), 500);
+            setTimeout(this.checkWakeOnLan.bind(this, callback), 5000);
         } else {
             this.checkCount = 0;
             callback(new Error('webOS - wake timeout'));
@@ -580,7 +580,7 @@ webosTvAccessory.prototype.getChannel = function (callback) {
 webosTvAccessory.prototype.setChannel = function (level, callback) {
     if (this.connected) {
         this.lgtv.request('ssap://tv/openChannel', {
-            channel: level
+            channelNumber: level
         });
         callback();
     } else {
