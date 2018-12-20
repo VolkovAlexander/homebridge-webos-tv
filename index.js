@@ -623,7 +623,7 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                 */
 
                 this.lgtv.request('ssap://tv/openChannel', {
-                    channelNumber: parseInt(level)
+                    channelId: parseInt(level)
                 });
 
                 setTimeout(() => {
