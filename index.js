@@ -509,7 +509,7 @@ webosTvAccessory.prototype.setState = function (state, callback) {
                     break;
                 } else {
                     this.log.info('webOS - try to reconnect');
-                    setTimeout(this.getState.bind(this, callback), 500);
+                    setTimeout(this.getState.bind(this, callback), 3500);
                 }
             }
 
