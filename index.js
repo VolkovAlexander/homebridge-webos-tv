@@ -622,6 +622,9 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                 }
                 */
 
+                let channels = this.lgtv.request('ssap://tv/getChannelList');
+                this.log.info(channels);
+
                 this.lgtv.request('ssap://tv/openChannel', {
                     channelId: "3_28_19_19_7115_18_1"
                 });
