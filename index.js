@@ -76,7 +76,6 @@ function mqttPublish(client, topic, message) {
 function webosTvAccessory(log, config, api) {
     this.mqttClient = mqttInit(config);
     this.topics = config.topics;
-    this.tvChannelId = 0;
 
     this.newTvChannel = 0;
     this.log = log;
@@ -622,9 +621,11 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                 }
                 */
 
-                this.lgtv.request('ssap://tv/openChannel', {
+                let res = this.lgtv.request('ssap://tv/openChannel', {
                     channelNumber: "" + level + ""
                 });
+
+                this.lgtv.info(res);
 
                 setTimeout(() => {
                     changeTvChannelInProgress = false;
