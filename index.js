@@ -177,14 +177,7 @@ function webosTvAccessory(log, config, api) {
         this.connected = false;
     });
 
-    this.powerService = new Service.Switch(this.name + " Power", "powerService");
     this.informationService = new Service.AccessoryInformation();
-
-
-    this.powerService
-        .getCharacteristic(Characteristic.On)
-        .on('get', this.getState.bind(this))
-        .on('set', this.setState.bind(this));
 
     this.informationService
         .setCharacteristic(Characteristic.Manufacturer, 'LG Electronics Inc.')
