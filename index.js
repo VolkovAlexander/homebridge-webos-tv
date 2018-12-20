@@ -625,7 +625,7 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
                     channelNumber: "" + level + ""
                 });
 
-                this.lgtv.info(res);
+                this.log.info(res);
 
                 setTimeout(() => {
                     changeTvChannelInProgress = false;
