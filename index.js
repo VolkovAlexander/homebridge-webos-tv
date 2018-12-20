@@ -72,6 +72,7 @@ function mqttPublish(client, topic, message) {
 // MAIN SETUP
 function webosTvAccessory(log, config, api) {
     this.mqttClient = mqttInit(config);
+    this.topics = config.topics;
 
     this.log = log;
     this.ip = config['ip'];
@@ -498,7 +499,7 @@ webosTvAccessory.prototype.getState = function (callback) {
 webosTvAccessory.prototype.setState = function (state, callback) {
     if (state) {
         if (!this.connected) {
-            mqttPublish(this.mqttClient, this.config.topics.setOn, "1");
+            mqttPublish(this.mqttClient, this.topics.setOn, "1");
         } else {
             callback();
         }
