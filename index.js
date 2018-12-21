@@ -548,6 +548,7 @@ webosTvAccessory.prototype.powerOnTvWithCallback = function (callback) {
 };
 
 webosTvAccessory.prototype.checkTVState = function (callback) {
+    /*
     tcpp.probe(this.ip, 3000, (err, isAlive) => {
         if (!isAlive) {
             this.connected = false;
@@ -555,8 +556,9 @@ webosTvAccessory.prototype.checkTVState = function (callback) {
             this.connected = true;
         }
         this.log.debug('webOS - TV state: %s', this.connected ? "On" : "Off");
-        callback(null, this.connected);
     });
+    */
+    callback(null, this.connected);
 };
 
 webosTvAccessory.prototype.checkForegroundApp = function (callback, appId) {
@@ -601,7 +603,7 @@ webosTvAccessory.prototype.checkWakeOnLan = function (callback) {
 // HOMEBRIDGE STATE SETTERS/GETTERS
 webosTvAccessory.prototype.getState = function (callback) {
     this.lgtv.connect(this.url);
-    //this.checkTVState.call(this, callback);
+    this.checkTVState.call(this, callback);
 };
 
 webosTvAccessory.prototype.setState = function (state, callback) {
