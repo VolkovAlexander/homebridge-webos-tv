@@ -177,7 +177,7 @@ function webosTvAccessory(log, config, api) {
         '3_44_97_97_7068_59_1',
         "",
         ""
-];
+    ];
 
     this.newTvChannel = 0;
     this.log = log;
@@ -601,7 +601,7 @@ webosTvAccessory.prototype.checkWakeOnLan = function (callback) {
 // HOMEBRIDGE STATE SETTERS/GETTERS
 webosTvAccessory.prototype.getState = function (callback) {
     this.lgtv.connect(this.url);
-    this.checkTVState.call(this, callback);
+    //this.checkTVState.call(this, callback);
 };
 
 webosTvAccessory.prototype.setState = function (state, callback) {
