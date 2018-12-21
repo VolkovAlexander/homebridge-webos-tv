@@ -595,6 +595,7 @@ webosTvAccessory.prototype.checkWakeOnLan = function (callback) {
 // HOMEBRIDGE STATE SETTERS/GETTERS
 webosTvAccessory.prototype.getState = function (callback) {
     //this.lgtv.connect(this.url);
+    callback();
 };
 
 webosTvAccessory.prototype.setState = function (state, callback) {
