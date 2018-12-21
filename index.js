@@ -295,14 +295,7 @@ function webosTvAccessory(log, config, api) {
         this.connected = false;
     });
 
-    this.powerService = new Service.Switch(this.name + " Power", "powerService");
     this.informationService = new Service.AccessoryInformation();
-
-
-    this.powerService
-        .getCharacteristic(Characteristic.On)
-        .on('get', this.getState.bind(this))
-        .on('set', this.setState.bind(this));
 
     this.informationService
         .setCharacteristic(Characteristic.Manufacturer, 'LG Electronics Inc.')
@@ -516,10 +509,9 @@ webosTvAccessory.prototype.updateAccessoryStatus = function () {
 
 webosTvAccessory.prototype.pollCallback = function (error, status) {
     if (!status) {
-        this.powerService.getCharacteristic(Characteristic.On).updateValue(status);
-        if (this.volumeService) this.volumeService.getCharacteristic(Characteristic.On).updateValue(status);
+        this.volumeService.getCharacteristic(Characteristic.On).updateValue(status);
     } else {
-        this.powerService.getCharacteristic(Characteristic.On).updateValue(status);
+        this.volumeService.getCharacteristic(Characteristic.On).updateValue(status);
     }
 };
 
