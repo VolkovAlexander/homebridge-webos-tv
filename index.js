@@ -609,8 +609,6 @@ webosTvAccessory.prototype.setState = function (state, callback) {
         if (!this.connected) {
             mqttPublish(this.mqttClient, this.topics.setOn, 0);
             mqttPublish(this.mqttClient, this.topics.setOn, 1);
-
-            this.checkWakeOnLan.bind(this, callback);
         } else {
             callback();
         }
@@ -703,11 +701,13 @@ webosTvAccessory.prototype.setChannel = function (level, callback) {
 
         this.newTvChannel = parseInt(level);
 
-        if(typeof this.channelsToIds[this.newTvChannel] !== 'undefined') {
-            this.lgtv.request('ssap://tv/openChannel', {
-                channelId: this.channelsToIds[this.newTvChannel]
-            });
-        }
+        setTimeout(() => {
+            if(typeof this.channelsToIds[this.newTvChannel] !== 'undefined') {
+                this.lgtv.request('ssap://tv/openChannel', {
+                    channelId: this.channelsToIds[this.newTvChannel]
+                });
+            }
+        }, 2000);
 
         callback();
     } else {
